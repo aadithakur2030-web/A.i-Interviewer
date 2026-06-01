@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>InterviewAI | Light Theme</title>
+    <style>
+        body { background:#f9f9f9; color:#333; font-family:'Segoe UI', sans-serif; margin:0; }
+        .container { margin:40px auto; width:80%; max-width:800px; background:#fff; padding:30px; border-radius:12px; box-shadow:0 0 15px rgba(0,0,0,0.1); }
+        h1,h2 { color:#0078d7; }
+        input,textarea { width:95%; margin:10px; padding:12px; border-radius:8px; border:1px solid #ccc; background:#fafafa; color:#333; }
+        button { background:#0078d7; color:#fff; padding:12px 20px; border:none; border-radius:8px; cursor:pointer; margin:10px; font-weight:bold; }
+        button:hover { background:#005a9e; }
+        #questionBox,#feedback,#score,#profileInfo { margin:20px; padding:15px; background:#f1f1f1; border-radius:8px; min-height:50px; white-space:pre-line; }
+        .hidden { display:none; }
+        #timer { font-size:18px; color:#d83b01; margin:10px; }
+        .progress { width:95%; background:#ddd; border-radius:8px; margin:20px auto; }
+        .progress-bar { height:20px; background:#0078d7; width:0%; border-radius:8px; }
+    </style>
+</head>
+<body>
+    <!-- Signup -->
+    <div class="container" id="signupPage">
+        <h2>📝 Signup</h2>
+        <input type="text" id="signupName" placeholder="Name">
+        <input type="email" id="signupEmail" placeholder="Email">
+        <input type="password" id="signupPassword" placeholder="Password">
+        <button onclick="signup()">Signup</button>
+        <div id="signupMsg"></div>
+    </div>
+
+    <!-- Login -->
+    <div class="container hidden" id="loginPage">
+        <h2>🔐 Login</h2>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <div id="loginMsg"></div>
+    </div>
+
+    <!-- Interview -->
+    <div class="container hidden" id="dashboardPage">
+        <h1>🚀 AI Interview</h1>
+        <textarea id="jobDesc" placeholder="Paste Job Description"></textarea>
+        <button onclick="startInterview()">Start Interview</button>
+        <div id="questionBox"></div>
+        <div id="timer"></div>
+        <textarea id="answerBox" placeholder="Type your answer"></textarea>
+        <button onclick="submitAnswer()">Submit Answer</button>
+        <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+        <div id="feedback"></div>
+        <div id="score"></div>
+    </div>
+
+    <!-- Profile -->
+    <div class="container hidden" id="profilePage">
+        <h1>👤 Profile</h1>
+        <div id="profileInfo"></div>
+        <button onclick="endInterview()">End Interview</button>
+    </div>
+
+<script>
+let score = 0, questionCount = 0, timerInterval;
+let questions = [];
+let currentUser = null;
+
+// Signup with localStorage
+function signup(){
+    let n=document.getElementById("signupName").value,
+            e=document.getElementById("signupEmail").value,
+            p=document.getElementById("signupPassword").value;
+    const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!n||n.length<2){document.getElementById("signupMsg").innerText="❌ Name too short";return;}
+    if(!emailRegex.test(e)){document.getElementById("signupMsg").innerText="❌ Invalid email";return;}
+    if(p.length<8){document.getElementById("signupMsg").innerText="❌ Password too weak";return;}
+    localStorage.setItem(e, JSON.stringify({name:n,email:e,password:p}));
+    document.getElementById("signupMsg").innerText="✅ Signup successful!";
+    document.getElementById("signupPage").classList.add("hidden");
+    document.getElementById("loginPage").classList.remove("hidden");
+}
+
+// Login with localStorage
+function login(){
+    let e=document.getElementById("email").value,
+            p=document.getElementById("password").value;
+    let user=localStorage.getItem(e);
+    if(user){
+        let parsed=JSON.parse(user);
+        if(parsed.password===p){
+            currentUser=parsed;
+            document.getElementById("loginPage").classList.add("hidden");
+            document.getElementById("dashboardPage").classList.remove("hidden");
+        } else document.getElementById("loginMsg").innerText="❌ Wrong password";
+    } else document.getElementById("loginMsg").innerText="❌ User not found";
+}
+
+// Start Interview
+function startInterview(){
+    let jd=document.getElementById("jobDesc").value;
+    // Public AI placeholder: later replace with Gemini API
+    if(jd.toLowerCase().includes("developer")){
+        questions=["Explain your coding experience.","What frameworks have you used?","Describe a debugging challenge.","How do you optimize performance?","Why do you want this developer role?"];
+    } else {
+        questions=["Tell me about yourself.","What are your strengths?","Describe a challenge you faced.","Why should we hire you?","Where do you see yourself in 5 years?"];
+    }
+    askQuestion();
+}
+
+// Ask Question with Voice
+function askQuestion(){
+    if(questionCount<5){
+        let q=questions[questionCount];
+        document.getElementById("questionBox").innerText="Q"+(questionCount+1)+": "+q;
+        speak(q);
+        startTimer();
+    }
+}
+
+// Voice (Text-to-Speech)
+function speak(text){
+    let utter=new SpeechSynthesisUtterance(text);
+    utter.lang="en-US"; utter.pitch=1; utter.rate=1; utter.volume=1;
+    speechSynthesis.speak(utter);
+}
+
+// Timer 60s
+function startTimer(){
+    let timeLeft=60;
+    document.getElementById("timer").innerText="⏳ "+timeLeft+"s left";
+    clearInterval(timerInterval);
+    timerInterval=setInterval(()=>{
+        timeLeft--;
+        document.getElementById("timer").innerText="⏳ "+timeLeft+"s left";
+        if(timeLeft<=0){ clearInterval(timerInterval);
+            document.getElementById("feedback").innerText="⚠️ Time over! Penalty applied.";
+            score-=5;
+        }
+    },1000);
+}
+
+// Submit Answer
+function submitAnswer(){
+    clearInterval(timerInterval);
+    let ans=document.getElementById("answerBox").value;
+    score+=Math.floor(Math.random()*10)+1;
+    document.getElementById("feedback").innerText="Feedback: '"+ans+"' recorded.";
+    questionCount++;
+    document.getElementById("progressBar").style.width=(questionCount/5*100)+"%";
+    if(questionCount<5) askQuestion(); else showProfile();
+}
+
+// Profile
+function showProfile(){
+    document.getElementById("dashboardPage").classList.add("hidden");
+    document.getElementById("profilePage").classList.remove("hidden");
+    let category="Average";
+    if(score>=70) category="Strong"; else if(score<40) category="Needs Improvement";
+    document.getElementById("profileInfo").innerText=
+        "Name: "+currentUser.name+"\nEmail: "+currentUser.email+
+        "\nFinal Score: "+score+" | Category: "+category+
+        "\nStrengths: Communication\nWeaknesses: Time management\nFeedback: Practice concise answers.";
+}
+
+// End
+function endInterview(){
+    document.getElementById("profilePage").innerHTML="<h2>✅ Interview Completed. Thank you!</h2>";
+}
+</script>
+</body>
+</html>
