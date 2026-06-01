@@ -20,7 +20,7 @@
 <body>
     <!-- Signup -->
     <div class="container" id="signupPage">
-        <h2>📝 Signup</h2>
+        <h2> Signup</h2>
         <input type="text" id="signupName" placeholder="Name">
         <input type="email" id="signupEmail" placeholder="Email">
         <input type="password" id="signupPassword" placeholder="Password">
@@ -30,7 +30,7 @@
 
     <!-- Login -->
     <div class="container hidden" id="loginPage">
-        <h2>🔐 Login</h2>
+        <h2> Login</h2>
         <input type="email" id="email" placeholder="Email">
         <input type="password" id="password" placeholder="Password">
         <button onclick="login()">Login</button>
@@ -39,7 +39,7 @@
 
     <!-- Interview -->
     <div class="container hidden" id="dashboardPage">
-        <h1>🚀 AI Interview</h1>
+        <h1> AI Interview</h1>
         <textarea id="jobDesc" placeholder="Paste Job Description"></textarea>
         <button onclick="startInterview()">Start Interview</button>
         <div id="questionBox"></div>
@@ -53,7 +53,7 @@
 
     <!-- Profile -->
     <div class="container hidden" id="profilePage">
-        <h1>👤 Profile</h1>
+        <h1> Profile</h1>
         <div id="profileInfo"></div>
         <button onclick="endInterview()">End Interview</button>
     </div>
@@ -69,11 +69,11 @@ function signup(){
             e=document.getElementById("signupEmail").value,
             p=document.getElementById("signupPassword").value;
     const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if(!n||n.length<2){document.getElementById("signupMsg").innerText="❌ Name too short";return;}
-    if(!emailRegex.test(e)){document.getElementById("signupMsg").innerText="❌ Invalid email";return;}
-    if(p.length<8){document.getElementById("signupMsg").innerText="❌ Password too weak";return;}
+    if(!n||n.length<2){document.getElementById("signupMsg").innerText=" Name too short";return;}
+    if(!emailRegex.test(e)){document.getElementById("signupMsg").innerText=" Invalid email";return;}
+    if(p.length<8){document.getElementById("signupMsg").innerText=" Password too weak";return;}
     localStorage.setItem(e, JSON.stringify({name:n,email:e,password:p}));
-    document.getElementById("signupMsg").innerText="✅ Signup successful!";
+    document.getElementById("signupMsg").innerText=" Signup successful!";
     document.getElementById("signupPage").classList.add("hidden");
     document.getElementById("loginPage").classList.remove("hidden");
 }
@@ -89,8 +89,8 @@ function login(){
             currentUser=parsed;
             document.getElementById("loginPage").classList.add("hidden");
             document.getElementById("dashboardPage").classList.remove("hidden");
-        } else document.getElementById("loginMsg").innerText="❌ Wrong password";
-    } else document.getElementById("loginMsg").innerText="❌ User not found";
+        } else document.getElementById("loginMsg").innerText=" Wrong password";
+    } else document.getElementById("loginMsg").innerText=" User not found";
 }
 
 // Start Interview
@@ -125,13 +125,13 @@ function speak(text){
 // Timer 60s
 function startTimer(){
     let timeLeft=60;
-    document.getElementById("timer").innerText="⏳ "+timeLeft+"s left";
+    document.getElementById("timer").innerText=" "+timeLeft+"s left";
     clearInterval(timerInterval);
     timerInterval=setInterval(()=>{
         timeLeft--;
-        document.getElementById("timer").innerText="⏳ "+timeLeft+"s left";
+        document.getElementById("timer").innerText=" "+timeLeft+"s left";
         if(timeLeft<=0){ clearInterval(timerInterval);
-            document.getElementById("feedback").innerText="⚠️ Time over! Penalty applied.";
+            document.getElementById("feedback").innerText=" Time over! Penalty applied.";
             score-=5;
         }
     },1000);
@@ -162,7 +162,7 @@ function showProfile(){
 
 // End
 function endInterview(){
-    document.getElementById("profilePage").innerHTML="<h2>✅ Interview Completed. Thank you!</h2>";
+    document.getElementById("profilePage").innerHTML="<h2> Interview Completed. Thank you!</h2>";
 }
 </script>
 </body>
